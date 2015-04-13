@@ -8,13 +8,10 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.serialization.ClassResolvers;
-import io.netty.handler.codec.serialization.ObjectDecoder;
-import io.netty.handler.codec.serialization.ObjectEncoder;
 
 import java.util.logging.Logger;
 
-import org.stephen.net.impl.ObjectHandlerClient;
+import org.stephen.net.impl.OpusClientHandler;
 
 /**
  * Establishes the connection between the client
@@ -39,7 +36,7 @@ public class ClientConnector {
 	private final static int PORT = 1337;
 	
 	/**
-	 * Registeres a connection to the server.
+	 * Registers a connection to the server.
 	 * @throws Exception
 	 */
 	public void connect() throws Exception {
@@ -56,16 +53,13 @@ public class ClientConnector {
 			bootstrap.handler(new ChannelInitializer<SocketChannel>() {
 				@Override
 				protected void initChannel(SocketChannel ch) throws Exception {
-					ch.pipeline().addLast(
-							new ObjectEncoder(),
-							new ObjectDecoder(ClassResolvers.cacheDisabled(null)),
-							new ObjectHandlerClient());
+					ch.pipeline().addLast(new OpusClientHandler());
 				}
 				
 			});
 			
 			// Start the client.
-	        ChannelFuture f = bootstrap.connect(HOST, PORT).sync(); // (5)
+	        ChannelFuture f = bootstrap.connect(HOST, PORT).sync();
 	
 	        logger.info("Connection established");
 	        
