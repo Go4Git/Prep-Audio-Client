@@ -14,10 +14,13 @@ import org.stephen.audio.OpusPlayer;
 public class ChunkedFileHandler extends ChannelInboundHandlerAdapter {
 
 	/**
-	 * The incoming data.
+	 * The byte total.
 	 */
 	private int total = 0;
 	
+	/**
+	 * Cache the incoming bytes.
+	 */
 	private ByteBuf incomingFile = Unpooled.buffer();
 	
 	@Override
@@ -26,18 +29,17 @@ public class ChunkedFileHandler extends ChannelInboundHandlerAdapter {
 		
 		ByteBuf buf = (ByteBuf) msg;
 		System.out.println("Readable bytes: " + buf.readableBytes());
-		byte[] data = new byte[buf.readableBytes()];
 		total += buf.readableBytes();
-		System.out.println("Data:" + data.length);
-		buf.readBytes(incomingFile);
 		System.out.println("Total: " + total);
+		incomingFile.writeBytes(buf);
 		
 		if (total == 2629170) {
 			System.out.println("------------------------------------------------");
 			System.out.println("-------------- Done Reading file ---------------");
 			System.out.println("------------------------------------------------");
 
-			System.out.println(incomingFile.array().length);
+			System.out.println("Length of incoming file: " + incomingFile.array().length);
+			System.out.println("Writing file...");
 			FileOutputStream fos = new FileOutputStream("./data/new.opus");
 			fos.write(incomingFile.array());
 			fos.close();
@@ -48,25 +50,5 @@ public class ChunkedFileHandler extends ChannelInboundHandlerAdapter {
 			OpusPlayer oPlayer = new OpusPlayer(oFile.getOggFile());
 			oPlayer.play();
 		}
-		
-		
-
-		
-		/*ByteBuffer nioBuffer = buf.nioBuffer();
-		FileOutputStream fos = new FileOutputStream("./data/new.opus");
-		FileChannel channel = fos.getChannel();
-		
-		while (nioBuffer.hasRemaining()) {
-			channel.write(nioBuffer);
-		}
-		
-		channel.close();
-		fos.close();
-
-		
-		if (msg instanceof OpusFile) {
-			OpusFile opusFile = (OpusFile) msg;
-			new OpusPlayer(opusFile.getOggFile()).play();
-		}*/
 	}
 }
