@@ -11,7 +11,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 
 import java.util.logging.Logger;
 
-import org.stephen.net.impl.OpusClientHandler;
+import org.stephen.net.impl.ChunkedFileHandler;
 
 /**
  * Establishes the connection between the client
@@ -53,7 +53,7 @@ public class ClientConnector {
 			bootstrap.handler(new ChannelInitializer<SocketChannel>() {
 				@Override
 				protected void initChannel(SocketChannel ch) throws Exception {
-					ch.pipeline().addLast(new OpusClientHandler());
+					ch.pipeline().addLast(new ChunkedFileHandler());
 				}
 				
 			});
